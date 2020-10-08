@@ -7,22 +7,44 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StorageNET20.Data;
 using StorageNET20.Models;
+using StorageNET20.Models.ViewModels;
 
 namespace StorageNET20.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly StorageNET20Context _context;
+        private readonly StorageNET20Context db;
 
         public ProductsController(StorageNET20Context context)
         {
-            _context = context;
+            db = context;
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    return View(await _context.Product.ToListAsync());
+        //} 
+
+        public async Task<IActionResult> Index(string name = null)
         {
-            return View(await _context.Product.ToListAsync());
+            //var model2 = db.Product.ToList();
+
+            var model =  db.Product.Select(p => new ProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Count = p.Count,
+                Price = p.Price,
+                InventoryValue = p.Price * p.Count
+            });
+
+            if(name != null)
+            {
+                model = model.Where(p => p.Name.Contains(name));
+            }
+
+            return View("Index2", await model.ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -33,7 +55,7 @@ namespace StorageNET20.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
+            var product = await db.Product
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -58,8 +80,8 @@ namespace StorageNET20.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                db.Add(product);
+                await db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -73,7 +95,7 @@ namespace StorageNET20.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
+            var product = await db.Product.FindAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -97,8 +119,8 @@ namespace StorageNET20.Controllers
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    db.Update(product);
+                    await db.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,7 +146,7 @@ namespace StorageNET20.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product
+            var product = await db.Product
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -139,15 +161,15 @@ namespace StorageNET20.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            _context.Product.Remove(product);
-            await _context.SaveChangesAsync();
+            var product = await db.Product.FindAsync(id);
+            db.Product.Remove(product);
+            await db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Product.Any(e => e.Id == id);
+            return db.Product.Any(e => e.Id == id);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace StorageNET20
             services.AddControllersWithViews();
 
             services.AddDbContext<StorageNET20Context>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("StorageNET20Context")));
+                    options.UseSqlServer(Configuration.GetConnectionString("StorageNET20Context")).EnableSensitiveDataLogging());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,7 +55,7 @@ namespace StorageNET20
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Products}/{action=Index}/{id?}");
             });
         }
     }

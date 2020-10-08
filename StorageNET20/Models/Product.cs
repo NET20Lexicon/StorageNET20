@@ -10,7 +10,7 @@ namespace StorageNET20.Models
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings =false)]
         [StringLength(30)]
         public string Name { get; set; }
 
@@ -29,6 +29,7 @@ namespace StorageNET20.Models
 
 
         [DisplayFormat(ConvertEmptyStringToNull = true, NullDisplayText = "-")]
+        [StringLength(50)]
         public string Shelf { get; set; }
 
 
@@ -36,7 +37,7 @@ namespace StorageNET20.Models
         public int Count { get; set; }
 
 
-        [Range(0, int.MaxValue)]
+        [StringLength(50)]
         [DisplayFormat(ConvertEmptyStringToNull = true, NullDisplayText = "-")]
         public string Description { get; set; }
     }
